@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - ReturnLoop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">ReturnLoop</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/get_ride">Get a Ride</a></li>
+                <li><a href="/pooling">Pooling</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="/login"><button class="login">Log In</button></a>
+                <a href="/signup"><button class="signup">Sign Up</button></a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Welcome to ReturnLoop</h1>
+            <p>Your journey, your way. Choose your ride option below.</p>
+            <div class="button-container">
+                <a href="/get_ride" class="large-button">Get a Ride</a>
+                <a href="/pooling" class="large-button">Do Pooling</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 ReturnLoop. All rights reserved.</p>
+    </footer>
+</body>
+</html>

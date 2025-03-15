@@ -1,0 +1,145 @@
+/* styles.css */
+:root {
+    --primary: #6a11cb;
+    --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    --secondary: #2c2c2c;
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --accent: #ff4d6d;
+    --light-bg: #f8f9fa;
+    --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--secondary);
+    color: var(--text-light);
+    padding: 15px 40px;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.auth-buttons .login,
+.auth-buttons .signup {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.auth-buttons .login {
+    background-color: transparent;
+    color: var(--text-light);
+    border: 2px solid var(--text-light);
+}
+
+.auth-buttons .signup {
+    background: var(--primary-gradient);
+    color: var(--text-light);
+}
+
+.hero {
+    text-align: center;
+    padding: 180px 20px 100px;
+    background: var(--primary-gradient);
+    color: var(--text-light);
+}
+
+.hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 20px;
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+.button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.large-button {
+    padding: 18px 40px;
+    border: none;
+    border-radius: 50px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.large-button:first-child {
+    background-color: var(--secondary);
+    color: var(--text-light);
+}
+
+.large-button:last-child {
+    background-color: transparent;
+    color: var(--text-light);
+    border: 2px solid var(--text-light);
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    background-color: var(--secondary);
+    color: var(--text-light);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
