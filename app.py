@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
 import heapq  # For Dijkstra's Algorithm
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
+app.secret_key = 'your_secret_key_here'  # Required for session management
+
 # Function to get a new database connection
 def get_db_connection():
     return mysql.connector.connect(
@@ -55,11 +56,13 @@ def dijkstra(graph, start, end):
 # Home route
 @app.route('/')
 def home():
-    return render_template('home.html')
+    user_name = session.get('name', None)  # Get the user's name from the session
+    return render_template('home.html', user_name=user_name)
 
 # Get Ride Route (Shortest Distance Calculation)
 @app.route('/get_ride', methods=['GET', 'POST'])
 def get_ride():
+    user_name = session.get('name', None)
     total_distance = None
     if request.method == 'POST':
         start = request.form.get('start_location')
@@ -81,15 +84,16 @@ def get_ride():
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO rides (start_location, destination, email) VALUES (%s, %s, %s)", 
-                           (start, destination, "anonymous"))  # Use "anonymous" since no user session
+                           (start, destination, session.get('email', 'anonymous')))  # Use session email
             conn.commit()
             conn.close()
 
-    return render_template('get_ride.html', total_distance=total_distance)
+    return render_template('get_ride.html', total_distance=total_distance, user_name=user_name)
 
 # Pooling Route
 @app.route('/pooling', methods=['GET', 'POST'])
 def pooling():
+    user_name = session.get('name', None)
     if request.method == 'POST':
         pickup = request.form.get('location')
         destination = request.form.get('destination')
@@ -109,11 +113,11 @@ def pooling():
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO pooling (pickup, destination, date, email) VALUES (%s, %s, %s, %s)", 
-                           (pickup, destination, date, "anonymous"))  # Use "anonymous" since no user session
+                           (pickup, destination, date, session.get('email', 'anonymous')))  # Use session email
             conn.commit()
             conn.close()
 
-    return render_template('pooling.html')
+    return render_template('pooling.html', user_name=user_name)
 
 # Signup Route
 @app.route('/signup', methods=['GET', 'POST'])
@@ -157,6 +161,8 @@ def login():
         conn.close()
 
         if user:
+            session['email'] = email  # Store email in session
+            session['name'] = user[1]  # Store user's name in session
             flash("Login successful!", "success")
             return redirect(url_for('home'))
         else:
@@ -164,9 +170,11 @@ def login():
 
     return render_template('login.html')
 
-# Logout Route (Optional, since there's no session management)
+# Logout Route
 @app.route('/logout')
 def logout():
+    session.pop('email', None)  # Remove email from session
+    session.pop('name', None)  # Remove name from session
     flash("Logged out successfully.", "info")
     return redirect(url_for('home'))
 
