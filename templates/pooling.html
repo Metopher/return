@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pooling - ReturnLoop</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .pooling-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .pooling-card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .pooling-card h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .pooling-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -31,6 +53,8 @@
         <section class="hero">
             <h1>Share Rides, Save More</h1>
             <p>Join others on your route and save money with ReturnLoop Pooling.</p>
+
+            <!-- Pooling Form -->
             <form class="auth-form" method="POST" action="/pooling">
                 <div class="form-group">
                     <label for="poolingLocation">Pickup Location</label>
@@ -46,7 +70,21 @@
                 </div>
                 <button type="submit">Find a Pool</button>
             </form>
-            <p>Prefer a solo ride? <a href="/get_ride">Get a Ride</a></p>
+
+            <!-- Display All Pooling Options -->
+            <div class="pooling-container">
+                {% if pooling_options %}
+                    {% for option in pooling_options %}
+                        <div class="pooling-card">
+                            <h3>From {{ option.pickup }} to {{ option.destination }}</h3>
+                            <p><strong>Date:</strong> {{ option.date }}</p>
+                            <p><strong>Email:</strong> {{ option.email }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No pooling options available at the moment.</p>
+                {% endif %}
+            </div>
         </section>
     </main>
 
