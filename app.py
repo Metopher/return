@@ -87,10 +87,15 @@ def get_ride():
 def pooling():
     user_name = session.get('name', None)
 
-    # Fetch all pooling options from the database
+    # Fetch all pooling options from the database with username instead of email
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM pooling ORDER BY pickup, destination, date")
+    cursor.execute("""
+        SELECT p.*, u.name as username 
+        FROM pooling p 
+        LEFT JOIN users u ON p.email = u.email 
+        ORDER BY p.pickup, p.destination, p.date
+    """)
     pooling_options = cursor.fetchall()
     conn.close()
 
@@ -121,6 +126,8 @@ def signup():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
+        phone = request.form.get('phone')
+        gender = request.form.get('gender')
         password = request.form.get('password')
 
         conn = get_db_connection()
@@ -134,7 +141,10 @@ def signup():
             conn.close()
             return redirect(url_for('login'))
 
-        cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
+        cursor.execute(
+            "INSERT INTO users (name, email, phone, gender, password) VALUES (%s, %s, %s, %s, %s)", 
+            (name, email, phone, gender, password)
+        )
         conn.commit()
         conn.close()
 
