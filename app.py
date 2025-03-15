@@ -15,43 +15,43 @@ def get_db_connection():
     )
 
 # Graph Representation of Kochi (Distances in KM)
-graph = {
-    "Aluva": {"Edappally": 10, "Kakkanad": 14},
-    "Edappally": {"Aluva": 10, "Kaloor": 6, "Kakkanad": 8},
-    "Kaloor": {"Edappally": 6, "MG Road": 4},
-    "MG Road": {"Kaloor": 4, "Fort Kochi": 11},
-    "Fort Kochi": {"MG Road": 11, "Willingdon Island": 5},
-    "Willingdon Island": {"Fort Kochi": 5, "Thevara": 6},
-    "Thevara": {"Willingdon Island": 6, "Vyttila": 7},
-    "Vyttila": {"Thevara": 7, "Kakkanad": 9, "Tripunithura": 6},
-    "Kakkanad": {"Edappally": 8, "Aluva": 14, "Vyttila": 9},
-    "Tripunithura": {"Vyttila": 6}
-}
+# graph = {
+#     "Aluva": {"Edappally": 10, "Kakkanad": 14},
+#     "Edappally": {"Aluva": 10, "Kaloor": 6, "Kakkanad": 8},
+#     "Kaloor": {"Edappally": 6, "MG Road": 4},
+#     "MG Road": {"Kaloor": 4, "Fort Kochi": 11},
+#     "Fort Kochi": {"MG Road": 11, "Willingdon Island": 5},
+#     "Willingdon Island": {"Fort Kochi": 5, "Thevara": 6},
+#     "Thevara": {"Willingdon Island": 6, "Vyttila": 7},
+#     "Vyttila": {"Thevara": 7, "Kakkanad": 9, "Tripunithura": 6},
+#     "Kakkanad": {"Edappally": 8, "Aluva": 14, "Vyttila": 9},
+#     "Tripunithura": {"Vyttila": 6}
+# }
 
 # Dijkstra's Algorithm to find the shortest distance
-def dijkstra(graph, start, end):
-    queue = [(0, start)]  # (distance, node)
-    distances = {node: float('inf') for node in graph}
-    distances[start] = 0
-    visited = set()
+# def dijkstra(graph, start, end):
+#     queue = [(0, start)]  # (distance, node)
+#     distances = {node: float('inf') for node in graph}
+#     distances[start] = 0
+#     visited = set()
 
-    while queue:
-        current_distance, current_node = heapq.heappop(queue)
+#     while queue:
+#         current_distance, current_node = heapq.heappop(queue)
 
-        if current_node in visited:
-            continue
-        visited.add(current_node)
+#         if current_node in visited:
+#             continue
+#         visited.add(current_node)
 
-        if current_node == end:
-            return current_distance  # Return total shortest distance
+#         if current_node == end:
+#             return current_distance  # Return total shortest distance
 
-        for neighbor, weight in graph[current_node].items():
-            distance = current_distance + weight
-            if distance < distances[neighbor]:
-                distances[neighbor] = distance
-                heapq.heappush(queue, (distance, neighbor))
+#         for neighbor, weight in graph[current_node].items():
+#             distance = current_distance + weight
+#             if distance < distances[neighbor]:
+#                 distances[neighbor] = distance
+#                 heapq.heappush(queue, (distance, neighbor))
 
-    return float('inf')  # No path found
+#     return float('inf')  # No path found
 
 # Home route
 @app.route('/')
@@ -63,7 +63,6 @@ def home():
 @app.route('/get_ride', methods=['GET', 'POST'])
 def get_ride():
     user_name = session.get('name', None)
-    total_distance = None
     if request.method == 'POST':
         start = request.form.get('start_location')
         destination = request.form.get('destination')
@@ -71,24 +70,17 @@ def get_ride():
         # Debugging Output
         print(f"Ride Request - Start: {start}, Destination: {destination}")
 
-        # Check if locations exist in the graph
-        if start not in graph or destination not in graph:
-            flash("Invalid locations entered! Please choose valid areas in Kochi.", "danger")
-            print("fail")
-        else:
-            total_distance = dijkstra(graph, start, destination)
-            flash(f"Shortest distance from {start} to {destination} is {total_distance} km.", "success")
-            print("success")
+        # Store ride details in the `rides` table
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO rides (start_location, destination, email) VALUES (%s, %s, %s)", 
+                       (start, destination, session.get('email', 'anonymous')))  # Use session email
+        conn.commit()
+        conn.close()
 
-            # Store ride details in the `rides` table
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO rides (start_location, destination, email) VALUES (%s, %s, %s)", 
-                           (start, destination, session.get('email', 'anonymous')))  # Use session email
-            conn.commit()
-            conn.close()
+        flash("Ride request submitted successfully!", "success")
 
-    return render_template('get_ride.html', total_distance=total_distance, user_name=user_name)
+    return render_template('get_ride.html', user_name=user_name)
 
 # Pooling Route
 @app.route('/pooling', methods=['GET', 'POST'])
@@ -102,20 +94,15 @@ def pooling():
         # Debugging Output
         print(f"Pooling Request - Pickup: {pickup}, Destination: {destination}, Date: {date}")
 
-        # Check if locations exist in the graph
-        if pickup not in graph or destination not in graph:
-            flash("Invalid locations entered! Please choose valid areas in Kochi.", "danger")
-        else:
-            total_distance = dijkstra(graph, pickup, destination)
-            flash(f"Shortest distance from {pickup} to {destination} is {total_distance} km.", "success")
+        # Store pooling details in the `pooling` table
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO pooling (pickup, destination, date, email) VALUES (%s, %s, %s, %s)", 
+                       (pickup, destination, date, session.get('email', 'anonymous')))  # Use session email
+        conn.commit()
+        conn.close()
 
-            # Store pooling details in the `pooling` table
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO pooling (pickup, destination, date, email) VALUES (%s, %s, %s, %s)", 
-                           (pickup, destination, date, session.get('email', 'anonymous')))  # Use session email
-            conn.commit()
-            conn.close()
+        flash("Pooling request submitted successfully!", "success")
 
     return render_template('pooling.html', user_name=user_name)
 
